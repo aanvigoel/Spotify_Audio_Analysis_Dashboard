@@ -13,8 +13,6 @@ def load_data():
         df = pkl.load(open("processed_df.pkl", "rb"))
     except OSError:
         df = pd.read_csv("processed_data.csv")
-    finally:
-        print("No processed data file found")
     return df
 
 
@@ -77,11 +75,11 @@ st.markdown(f""" <style>
         padding-bottom: {padding}rem;
     }} </style> """, unsafe_allow_html=True)
 
-'''st.markdown(""" <style>
+st.markdown(""" <style>
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 </style> """, unsafe_allow_html=True)
-'''
+
 st.markdown(""" <style> .font {
 font-size:40px; color:#5cb85c; font-family: "Proxima Nova"; font-weight:bold} 
 </style> """, unsafe_allow_html=True)
