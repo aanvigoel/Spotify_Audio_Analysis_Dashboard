@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+matplotlib
+plotly
+PIL
+spotipy
+pymongo
+pickle
+time
