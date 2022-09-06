@@ -6,5 +6,4 @@ plotly
 Pillow
 spotipy
 pymongo
-pickle
 time
