@@ -3,3 +3,4 @@ credentials.txt
 *.pyc
 .cache
 .ipynb_checkpoints
+.DS_Store
