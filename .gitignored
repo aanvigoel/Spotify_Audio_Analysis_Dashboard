@@ -3,8 +3,6 @@ credentials.txt
 *.pyc
 .cache
 .ipynb_checkpoints
-<<<<<<< Updated upstream
 .DS_Store
-=======
-.DS_Store
->>>>>>> Stashed changes
+.csv
+.pkl
