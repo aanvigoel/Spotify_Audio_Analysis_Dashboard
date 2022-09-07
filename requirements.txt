@@ -5,4 +5,8 @@ matplotlib
 plotly
 Pillow
 spotipy
+<<<<<<< Updated upstream
 pymongo
+=======
+pymongo
+>>>>>>> Stashed changes

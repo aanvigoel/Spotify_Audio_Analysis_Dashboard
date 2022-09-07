@@ -26,6 +26,7 @@ def get_unique(df):
 def data_describe(df, features, row):
     stats = df.drop(features, axis=1)
     table = stats.describe()
+    table.insert(0, "stats", table.index)
     table = table.drop(row, axis=0)
     return table
 
@@ -97,29 +98,41 @@ st.sidebar.write('Total no. of artists analyzed:', num_unique['artists'])
 list_of_years = np.sort(df.year.unique())
 st.sidebar.write('Tracks across years:', list_of_years[0], '-', list_of_years[-1])
 
-st.sidebar.subheader('Choose Analysis:')
-checkbox1 = st.sidebar.checkbox('Display Audio Feature Trends')
-checkbox2 = st.sidebar.checkbox('Display Data Statistics')
+st.sidebar.markdown("""<hr style="height:5px;border:none;background-color:#5cb85c;" /> """, unsafe_allow_html=True)
 
-st.sidebar.subheader('Audio Features')
-st.sidebar.text('Mood:\nDanceability, Valence,\nEnergy, Tempo')
-st.sidebar.text('Properties:\nLoudness, Speechiness,\nInstrumentalness')
-st.sidebar.text('Context:\nAcousticness')
+st.sidebar.header('Audio Features')
+st.sidebar.write('Mood:\nDanceability, Valence,\nEnergy, Tempo')
+st.sidebar.write('Properties:\nLoudness, Speechiness,\nInstrumentalness')
+st.sidebar.write('Context:\nAcousticness')
 
 ## Section 2: Feature Trends by Year
+options = st.multiselect(
+    'Choose Analysis:',
+    ['Audio Feature Trends', 'Data Statistics'],
+    ['Audio Feature Trends'])
+
 c1, c2 = st.columns(2)
-select_year = c1.selectbox('Select Year', list_of_years)
+select_year = c1.selectbox('Select Year', list_of_years, index=40)
 df_year = df.query("year == @select_year")
 
-list_of_features = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness', 'instrumentalness',
-                    'valence', 'tempo']
+if "Audio Feature Trends" in options:
+    # st.subheader('Top Tracks per Audio Feature')
+    #st.write('Top tracks for', select_feature, ' for in year', select_year)
+    c3, c4 = st.columns((1, 3))
 
-if checkbox1:
-    st.subheader('Top Tracks per Audio Feature')
+    list_of_features = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness', 'instrumentalness',
+                        'valence', 'tempo']
     select_feature = c2.selectbox('Select Feature', list_of_features)
 
     df_track = df_year.sort_values(by=select_feature, ascending=False)
     df_track_top = df_track.head(10)
+
+    # Show Top tracks
+    top_tracks = list(df_track_top["name"])
+    c3.text('\n')
+    for idx, track in enumerate(top_tracks):
+        s = str(idx+1)+ '. '+ track
+        c3.text(s)
 
     # Plotting top tracks for each feature category
     fig = px.bar(df_track_top, x=select_feature, y="name", hover_data=["artists"], text="name",
@@ -127,9 +140,9 @@ if checkbox1:
     fig.update_xaxes(title_text=select_feature.capitalize())
     fig.update_yaxes(title_text="Track", showticklabels=False)
     fig.update_traces(marker_color='#d9534f', marker_line_color='rgb(0, 2, 1)', textposition="inside", textfont_size=35)
-    fig.update_layout(title=dict(font_size=16, x=0.5), hoverlabel=dict(bgcolor="white", font_size=14),
+    fig.update_layout(title=dict(font_size=14, x=0.5), hoverlabel=dict(bgcolor="white", font_size=14),
                       xaxis=dict(showgrid=False), yaxis=dict(zeroline=False, showgrid=False))
-    st.plotly_chart(fig, use_container_width=True)
+    c4.plotly_chart(fig, use_container_width=True)
 
     with st.expander("See feature explanation"):
         st.write(feature_explanations[select_feature])
@@ -141,14 +154,15 @@ exclude_stats = ["25%", "50%", "std", "count"]
 table_style = [
     dict(selector='td:hover',
          props=[('background-color', '#d9534f')]),
-    dict(selector='.index_name',
-         props='font-style: italic; color: darkgrey; font-weight:normal;'),
-    dict(selector='th:not(.index_name)',
+    dict(selector='th',
          props='background-color: #5cb85c; color: white;')
 ]
 
-if checkbox2:
+if "Data Statistics" in options:
     st.subheader('Data Statistics by Year')
     pd.set_option('display.float_format', lambda x: '%.2f' % x)
     d1 = data_describe(df_year, exclude_features, exclude_stats)
+    header = ['stats','danceability','energy', 'loudness', 'speechiness', 'acousticness', 'instrumentalness',  'valence', 'tempo']
+    feature_range = ['range', '0-1', '0-1', '-60db - 0db', '0-1', '0-1', '0-1', '0-1', '-']
+    d1.columns=[header,feature_range]
     st.table(d1.style.set_table_styles(table_style))
